@@ -12,7 +12,7 @@ import (
 func main() {
 
 	//
-	// run `go run client.go gen` to generate the static key of the client
+	// run `go run client.go setup` to generate the static key of the client
 	//
 	if len(os.Args) == 2 && os.Args[1] == "setup" {
 

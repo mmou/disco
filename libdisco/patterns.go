@@ -44,6 +44,10 @@ const (
 	// validate the received keys properly.
 	Noise_XX
 
+	// Noise_IKpsk2 is a pattern where the initiator's static key is immediately
+	// sent to the responder, and both parties have a pre-shared secret key
+	Noise_IKpsk2
+
 	// Not documented
 	Noise_KX
 	Noise_XK
@@ -193,7 +197,7 @@ var patterns = map[noiseHandshakeType]handshakePattern{
 			messagePattern{},        // ←
 		},
 		messagePatterns: []messagePattern{
-			messagePattern{token_e},                                        // →
+			messagePattern{token_e}, // →
 			messagePattern{token_e, token_ee, token_se, token_s, token_es}, // ←
 		},
 	},
@@ -266,6 +270,25 @@ var patterns = map[noiseHandshakeType]handshakePattern{
 		messagePatterns: []messagePattern{
 			messagePattern{token_e},                      // →
 			messagePattern{token_e, token_ee, token_psk}, // ←
+		},
+	},
+
+	/*
+		IKpsk2(s, rs):
+		<- s
+		...
+		-> e, es, s, ss
+		<- e, ee, se, psk
+	*/
+	Noise_IKpsk2: handshakePattern{
+		name: "IKpsk2",
+		preMessagePatterns: []messagePattern{
+			messagePattern{},        // →
+			messagePattern{token_s}, // ←
+		},
+		messagePatterns: []messagePattern{
+			messagePattern{token_e, token_es, token_s, token_ss},   // →
+			messagePattern{token_e, token_ee, token_se, token_psk}, // ←
 		},
 	},
 }

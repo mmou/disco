@@ -121,23 +121,28 @@ func (timeoutError) Temporary() bool { return true }
 var errNoPubkeyVerifier = errors.New("Disco: no public key verifier set in Config")
 var errNoProof = errors.New("Disco: no public key proof set in Config")
 
+// TODO for IKpsk2
 func checkRequirements(isClient bool, config *Config) (err error) {
 	ht := config.HandshakePattern
 	if ht == Noise_NX || ht == Noise_KX || ht == Noise_XX || ht == Noise_IX {
 		if isClient && config.PublicKeyVerifier == nil {
+			// client (initiator) is receiving a static key from server (responder)
 			return errNoPubkeyVerifier
 		} else if !isClient && config.StaticPublicKeyProof == nil {
+			// server needs to provide proof of key
 			return errNoProof
 		}
 	}
-	if ht == Noise_XN || ht == Noise_XK || ht == Noise_XX || ht == Noise_X || ht == Noise_IN || ht == Noise_IK || ht == Noise_IX {
+	if ht == Noise_XN || ht == Noise_XK || ht == Noise_XX || ht == Noise_X || ht == Noise_IN || ht == Noise_IK || ht == Noise_IX || ht == Noise_IKpsk2 {
 		if isClient && config.StaticPublicKeyProof == nil {
+			// client needs to provide proof of key
 			return errNoProof
 		} else if !isClient && config.PublicKeyVerifier == nil {
+			// server is receiving a static key from client
 			return errNoPubkeyVerifier
 		}
 	}
-	if ht == Noise_NNpsk2 && len(config.PreSharedKey) != 32 {
+	if ht == Noise_NNpsk2 || ht == Noise_IKpsk2 && len(config.PreSharedKey) != 32 {
 		return errors.New("noise: a 32-byte pre-shared key needs to be passed as noise.Config")
 	}
 	return nil
